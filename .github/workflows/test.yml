@@ -1,4 +1,6 @@
 # Runs the accuracy checks on every push and pull request, on the Node versions Bulwark supports.
+# Linux only: hosted macOS runners weren't available to this repository (jobs queued, then timed out unstarted).
+# Bulwark is tested on macOS locally with the same commands before each release.
 name: test
 on:
   push:
@@ -10,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         node: [22, 24]
     steps:
       - uses: actions/checkout@v4
