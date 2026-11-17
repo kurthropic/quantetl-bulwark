@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/bulwark-logo-banner.png" alt="QuantETL Bulwark v1.12 Beta Release 01" width="520"></p>
+
 # QuantETL Bulwark
 
 **Prepare, prove and move data entirely on your own machine.** Bulwark is the open-source engine and terminal app of
@@ -11,7 +13,7 @@ git clone <this repository> bulwark && cd bulwark
 bulwark help
 ```
 
-![QuantETL Bulwark v1.12 Beta Release 01](assets/bulwark-logo.png)
+<p align="center"><img src="assets/bulwark-logo-banner.png" alt="QuantETL Bulwark v1.12 Beta Release 01" width="520"></p>
 
 Version: **v1.12 Beta Release 01**.
 
