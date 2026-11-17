@@ -13,8 +13,6 @@ git clone <this repository> bulwark && cd bulwark
 bulwark help
 ```
 
-<p align="center"><img src="assets/bulwark-logo-banner.png" alt="QuantETL Bulwark v1.12 Beta Release 01" width="520"></p>
-
 Version: **v1.12 Beta Release 01**.
 
 The terminal edition of QuantETL, built for air-gapped and defence networks. It prepares, checks, signs and moves data
