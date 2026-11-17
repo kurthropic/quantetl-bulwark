@@ -1,0 +1,9 @@
+QuantETL Bulwark
+Copyright 2026 Chareen Weerasinghe and the QuantETL Bulwark contributors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+"QuantETL" and "Bulwark", and the QuantETL and Bulwark logos, are trademarks of their owner and are not
+licensed under the Apache License. See TRADEMARKS.md.
+
+This product contains no third-party code. It uses only the Node.js standard library at run time.

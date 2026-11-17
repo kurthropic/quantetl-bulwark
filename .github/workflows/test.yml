@@ -1,0 +1,29 @@
+# Runs the accuracy checks on every push and pull request, on the Node versions Bulwark supports.
+name: test
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: python3 test-data/ai/make.py > /dev/null
+      - run: node test-data/ai/check.js
+      - name: CLI smoke test
+        env:
+          BULWARK_HOME: ${{ runner.temp }}/bulwark-home
+        run: |
+          node bin/bulwark --version
+          node bin/bulwark crucible prepare test-data/ai/corpus.jsonl -o recipe.json
+          node bin/bulwark courier pack test-data/ai/corpus.jsonl --recipe recipe.json --license cc-by-4.0 --contributor "CI, GitHub" --i-have-the-rights -o pkg.tar.gz
+          node bin/bulwark courier verify pkg.tar.gz

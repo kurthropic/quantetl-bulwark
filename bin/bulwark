@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+// QuantETL Bulwark: the terminal edition. Run "bulwark help", or "bulwark" alone for the interactive shell.
+'use strict';
+process.stdout.on('error', (e) => { if (e.code === 'EPIPE') process.exit(0); throw e; }); // output piped into head, etc.
+require('../lib/bulwark').main(process.argv.slice(2)).then((code) => { process.exitCode = code || 0; }, (e) => { console.error(e && e.message ? e.message : e); process.exitCode = 1; });
