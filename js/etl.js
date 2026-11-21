@@ -883,8 +883,11 @@
     }
   }
   const textKey = (norm) => { const [a, b] = hash2(norm); return (a >>> 11) * 4294967296 + (b >>> 0); };
+  // opts.ngram: words per passage (default 13). opts.minOverlap: report a non-exact row only when at least this share of
+  // its passages appear in the training data (default 0: any shared passage). Overlap counts each distinct passage
+  // once, however many training rows repeat it.
   function createContamination(evalTexts, opts = {}) {
-    const n = opts.ngram || 13, exact = new Map(), grams = new Map(), info = evalTexts.map(() => ({ exact: false, hits: 0, grams: 0, trainRow: -1 }));
+    const n = opts.ngram || 13, minOverlap = opts.minOverlap || 0, exact = new Map(), grams = new Map(), info = evalTexts.map(() => ({ exact: false, hits: 0, grams: 0, trainRow: -1, hit: null }));
     evalTexts.forEach((t, i) => {
       const norm = normText(textOf(t)); if (!norm) return;
       const k = textKey(norm); if (!exact.has(k)) exact.set(k, []); exact.get(k).push(i);
@@ -898,17 +901,15 @@
         for (const t of trainTexts) {
           const row = trainRows++, norm = normText(textOf(t)); if (!norm) continue;
           const ex = exact.get(textKey(norm)); if (ex) for (const i of ex) { info[i].exact = true; if (info[i].trainRow < 0) info[i].trainRow = row; }
-          let seen = null;
           gramKeys(norm, n, (g) => {
             const hit = grams.get(g); if (!hit) return;
-            seen = seen || new Set();
-            for (const i of hit) { const k = i + ':' + g; if (seen.has(k)) continue; seen.add(k); info[i].hits++; if (info[i].trainRow < 0) info[i].trainRow = row; }
+            for (const i of hit) { const x = info[i]; if (!x.hit) x.hit = new Set(); if (x.hit.has(g)) continue; x.hit.add(g); x.hits++; if (x.trainRow < 0) x.trainRow = row; }
           });
         }
       },
       finish() {
-        const rows = info.map((x, i) => ({ index: i, exact: x.exact, overlap: x.grams ? Math.min(1, x.hits / x.grams) : 0, trainRow: x.trainRow })).filter(x => x.exact || x.overlap > 0);
-        return { evalRows: evalTexts.length, trainRows, ngram: n, contaminated: rows.length, exact: rows.filter(x => x.exact).length, rows };
+        const rows = info.map((x, i) => ({ index: i, exact: x.exact, overlap: x.grams ? Math.min(1, x.hits / x.grams) : 0, trainRow: x.trainRow })).filter(x => x.exact || (x.overlap > 0 && x.overlap >= minOverlap));
+        return { evalRows: evalTexts.length, trainRows, ngram: n, minOverlap, contaminated: rows.length, exact: rows.filter(x => x.exact).length, rows };
       },
     };
   }

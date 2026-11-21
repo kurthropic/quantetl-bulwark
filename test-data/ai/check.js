@@ -65,6 +65,16 @@ const check = (name, ok, detail) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${na
   const found = new Set(c.rows.map(x => ev.rows[x.index][EID])), want = new Set(ans.contaminated.map(x => x.id));
   const miss = [...want].filter(id => !found.has(id)), fp = [...found].filter(id => !want.has(id));
   check('contamination: all 150 found, none extra', miss.length === 0 && fp.length === 0, `${want.size - miss.length}/150 found, ${fp.length} false alarms, ${c.exact} exact copies; ${Date.now() - t0} ms`);
+  // One 13-word quote from a 200-word evaluation text, repeated in 300 training rows: 1 of its 188 passages leaked.
+  const words = Array.from({ length: 200 }, (_, i) => 'w' + i), quote = words.slice(0, 13).join(' ');
+  const rep = Array.from({ length: 300 }, (_, i) => `row ${i} unrelated text then ${quote} and more`);
+  const ov = Q.contamination(rep, [words.join(' ')]).rows[0]?.overlap;
+  check('contamination: a repeated passage counts once', Math.abs(ov - 1 / 188) < 1e-9, `overlap ${ov === undefined ? 'missing' : pct(ov)}, expected 0.53%`);
+  const fil = Q.contamination(rep, [words.join(' '), quote + ' tail'], { minOverlap: 0.2 });
+  check('contamination: a minimum overlap drops small overlaps, keeps large ones', fil.contaminated === 1 && fil.rows[0].index === 1 && fil.minOverlap === 0.2, `${fil.contaminated} reported: ${fil.rows.map(x => 'row ' + (x.index + 1) + ' ' + pct(x.overlap)).join(', ')}`);
+  const tr = ['alpha beta gamma delta epsilon zeta eta theta iota kappa'], q = ['one two alpha beta gamma delta epsilon zeta eta theta three'];
+  const c8 = Q.contamination(tr, q, { ngram: 8 }), c13 = Q.contamination(tr, q);
+  check('contamination: the passage length can be set', c8.contaminated === 1 && c8.ngram === 8 && c13.contaminated === 0, `8-word: ${c8.contaminated} found (1 expected); 13-word: ${c13.contaminated} found (0 expected)`);
 
   // 6. Fine-tuning records
   const chats = read('support_chats.jsonl');

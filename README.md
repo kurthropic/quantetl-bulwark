@@ -52,7 +52,7 @@ The signing identity is your macOS user name. Change it with `--as <name>` or `B
 | `crucible prepare <file> -o recipe.json` | Builds a recipe of recommended steps, each with its reason |
 | `crucible ops` / `new` / `add` / `remove` / `show` | Inspects and edits recipes. Example: `crucible add r.json near_duplicates column=text threshold=0.85` |
 | `crucible run <file> --recipe r.json -o out.parquet` | Runs the recipe over the whole file. Writes JSONL, Parquet or CSV, plus a removal ledger |
-| `tripwire <train> --eval <file>` | Leak check: finds evaluation rows that also appear in the training data |
+| `tripwire <train> --eval <file> [--ngram 13] [--min-overlap 20%]` | Leak check: finds evaluation rows that also appear in the training data, as exact copies or through a shared 13-word passage. `--ngram` sets the passage length (5–50 words); `--min-overlap` reports a row only when at least that share of its passages appear |
 | `ledger <ledger.csv>` | Summarises what each step removed, and why |
 | `signet sign <out> --source <in> --recipe r.json` / `signet verify <manifest> --output <out>` / `signet key` | Signed manifests of the source, steps and output, and verifying them |
 | `cairn log` / `cairn verify` / `cairn export -o audit.jsonl` | The activity record. It is hash-chained, so an edited entry fails `verify`. Export is JSON Lines for a SIEM |
